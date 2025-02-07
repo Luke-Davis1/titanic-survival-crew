@@ -178,6 +178,14 @@ print("""
 ###################     BIVARIATE VISUALIZATIONS    ############################
 ################################################################################
 """)
+
+# Scatter plot of age vs survived
+plt.scatter(df["Age"], df["Lived_Died_int"])
+plt.xlabel("Age")
+plt.ylabel("Survived")
+plt.title("Scatterplot of Age vs Survived for crew members")
+plt.show()
+
 print("Displayed bar graph of age vs survived....")
 bin_list = [0, 10, 20, 30, 40, 50, 60, 70, 80]
 
@@ -214,6 +222,15 @@ plt.legend(title='Survived', labels=['SAVED', 'LOST'])
 plt.tight_layout()
 plt.show()
 
+df['Boat_int'] = le.fit_transform(df['Boat'])
+
+# Scatter plot of Joined vs survived
+plt.scatter(df["Boat_int"], df["Lived_Died_int"])
+plt.xlabel("Boat")
+plt.ylabel("Survived")
+plt.title("Scatterplot of Boat vs Survived for crew members")
+plt.show()
+
 print("Displayed bar graph of joined vs survived....")
 grouped = df.groupby(['Joined', 'Survived?']).size().unstack(fill_value=0)
 grouped.plot(kind='bar', stacked=False, figsize=(10, 6))
@@ -223,6 +240,15 @@ plt.ylabel('Count')
 plt.xticks(rotation=70)
 plt.legend(title='Survived', labels=['SAVED', 'LOST'])
 plt.tight_layout()
+plt.show()
+
+df['Body_int'] = le.fit_transform(df['Body'])
+
+# Scatter plot of Joined vs survived
+plt.scatter(df["Body_int"], df["Lived_Died_int"])
+plt.xlabel("Body")
+plt.ylabel("Survived")
+plt.title("Scatterplot of Body vs Survived for crew members")
 plt.show()
 
 ##################       MULTIVARIATE VISUALIZATIONS   #######################
@@ -277,7 +303,7 @@ print("""
 df = df.dropna(subset=["Lived_Died_int"])
 df = df.apply(preprocessing.LabelEncoder().fit_transform)
 
-X = df.drop(columns=["Lived_Died_int", 'Age_Bins', 'Survived?'])
+X = df.drop(columns=["Lived_Died_int", 'Age_Bins', 'Survived?', 'Boat_int', 'Body_int'])
 y = df["Lived_Died_int"]
 
 features = X.columns
@@ -343,7 +369,7 @@ print("""
 print("""Based on the feature selection methods, it would appear that Boat and
 Died are both good features to be able to build accurate predictive models.
 Clearly, Died is essentially the same as the target variable of survived because
-all the crew members who died in the Titanic crash would have their death year
+all the crew members who died in the Titanic crash would have theigr death year
 as 1912. While SelectKBest didn't include it, RFE was able to find that age
 was a significant feature. Thus, if I were to recommend a simple model using
 certain features, I think a good model could include 'Died', 'Age', 'Boat', and

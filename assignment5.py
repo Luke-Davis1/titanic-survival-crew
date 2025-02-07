@@ -15,6 +15,11 @@ from sklearn.feature_selection import RFE
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.preprocessing import LabelEncoder
+import warnings
+from sklearn.exceptions import ConvergenceWarning
+
+# Suppress ConvergenceWarning
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 # Set options
 pd.set_option('display.max_columns', None)
@@ -179,6 +184,7 @@ print("""
 ################################################################################
 """)
 
+print("Displayed scatter plot of age vs survived....")
 # Scatter plot of age vs survived
 plt.scatter(df["Age"], df["Lived_Died_int"])
 plt.xlabel("Age")
@@ -224,6 +230,7 @@ plt.show()
 
 df['Boat_int'] = le.fit_transform(df['Boat'])
 
+print("Displayed scatter plot of boat vs survived....")
 # Scatter plot of Joined vs survived
 plt.scatter(df["Boat_int"], df["Lived_Died_int"])
 plt.xlabel("Boat")
@@ -244,6 +251,7 @@ plt.show()
 
 df['Body_int'] = le.fit_transform(df['Body'])
 
+print("Displayed scatter plot of body vs survived....")
 # Scatter plot of Joined vs survived
 plt.scatter(df["Body_int"], df["Lived_Died_int"])
 plt.xlabel("Body")
@@ -260,12 +268,11 @@ print("""
 
 df['Age_Bins'] = pd.cut(x=df['Age'], bins=[0, 9, 19, 29, 39, 49, 59, 69, 79])
 
-table = pd.pivot_table(df, values='Lived_Died_int', index=['Joined'], columns=['Class_Dept', 'Age_Bins'])
+table = pd.pivot_table(df, values='Lived_Died_int', index=['Joined'], columns=['Class_Dept', 'Age_Bins'], observed=False)
 
-table.applymap(lambda x: 1 - x)  # the results are inverted for the heatmap
+table.map(lambda x: 1 - x)
 
 plt.figure(figsize=(11,5))
-#ax = plt.axes()
 plt.suptitle("Heatmap Comparing Age and Class_Dept")
 sns.heatmap(table, annot=True, fmt='.2f')
 
@@ -331,7 +338,7 @@ print(cm)
 print(f'Accuracy = {str(accuracy_score(y_test, y_pred))}')
 
 
-print("""RFE reported these top 3 features:
+print("""\nRFE reported these top 3 features:
       1. Died
       2. Age
       3. Boat
@@ -344,7 +351,7 @@ df_encoded = df.copy()
 for column in df_encoded.columns:
     df_encoded[column] = le.fit_transform(df_encoded[column])
 
-X = df_encoded.drop(columns=["Lived_Died_int", 'Age_Bins', 'Survived?'])
+X = df_encoded.drop(columns=["Lived_Died_int", 'Age_Bins', 'Survived?', 'Boat_int', 'Body_int'])
 y = df_encoded['Lived_Died_int']  # Target variable
 
 selector = SelectKBest(chi2, k=3)
